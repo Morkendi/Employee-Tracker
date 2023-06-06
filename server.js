@@ -152,11 +152,9 @@ const addDepartment = () => {
             name: 'addDepartment',
             type: 'input',
             message: 'Enter the name of the new department:',
-            validate: (addDepartment) => {
-                if (!addDepartment) {
+            validate: (input) => {
+                if (!input) {
                     return 'Please enter a department name.';
-                } else if (input > 50) {
-                    return 'Department name must be less than 50 characters.';
                 } else {
                     return true;
                 }
@@ -308,10 +306,10 @@ const addEmployee = () => {
 const deleteDepartment = () => {
     let query =`SELECT department.id, department.name FROM department`;
 
-    connection.promise().query(query, (err, res) => {
+    connectDB.query(query, (err, res) => {
     if (err) throw err;
     let departmentArray = [];
-    response.forEach((department) => {departmentArray.push(department.name);});
+    res.forEach((department) => {departmentArray.push(department.name);});
     
     inquirer.prompt([
         {
@@ -324,38 +322,38 @@ const deleteDepartment = () => {
     .then((answer) => {
         let departmentID;
     
-        response.forEach((department) => {
+        res.forEach((department) => {
             if (answer.deleteDepartment === department.name) {
             departmentID = department.id;
             }
         });
     
-        let query = `DELETE FROM department WHERE department.name = ?`;
-        connection.query(query, departmentID, (err) => {
+    let query = `DELETE FROM department WHERE department.name = ?`;
+    connectDB.query(query, departmentID, (err) => {
+        if (err) throw err;
+        console.log('Department Successfully Removed');
+    
+        let newquery = `SELECT department.id AS ID, 
+                        department.name AS "Department Name" 
+                        FROM department`;
+    
+        connectDB.query(newquery, (err, res) => {
             if (err) throw err;
-            console.log('Department Successfully Removed');
     
-            let newquery = `SELECT department.id AS ID, 
-                            department.name AS "Department Name" 
-                            FROM department`;
-    
-            connectDB.query(newquery, (err, res) => {
-                if (err) throw err;
-    
-                console.table(res);
+            console.table(res);
             });
         });
-        });
+    });
     });
 };
 
 const deleteRole = () => {    
     let query =`SELECT role.id, role.title FROM role`;
 
-connection.promise().query(query, (err, res) => {
+connectDB.query(query, (err, res) => {
 if (err) throw err;
 let rolesArray = [];
-response.forEach((role) => {rolesArray.push(role.title);});
+res.forEach((role) => {rolesArray.push(role.title);});
 
 inquirer.prompt([
     {
@@ -368,14 +366,14 @@ inquirer.prompt([
 .then((answer) => {
     let roleID;
 
-    response.forEach((role) => {
+    res.forEach((role) => {
         if (answer.deleteRole === role.title) {
         roleID = role.id;
         }
     });
 
     let query = `DELETE FROM role WHERE role.id = ?`;
-    connection.query(query, roleID, (err) => {
+    connectDB.query(query, roleID, (err) => {
         if (err) throw err;
         console.log('Role Successfully Removed');
 
@@ -392,6 +390,7 @@ inquirer.prompt([
 
             console.table(res);
         });
+        startMenu();
     });
     });
 });
@@ -400,10 +399,10 @@ inquirer.prompt([
 const deleteEmployee = () => {
     let query =`SELECT employee.id, employee.first_name, employee.last_name FROM employee`;
 
-    connection.promise().query(query, (err, res) => {
+    connectDB.query(query, (err, res) => {
     if (err) throw err;
     let employeeNames = [];
-    response.forEach((employee) => {employeeNames.push(`${employee.first_name} ${employee.last_name}`);});
+    res.forEach((employee) => {employeeNames.push(`${employee.first_name} ${employee.last_name}`);});
 
     inquirer.prompt([
         {
@@ -416,7 +415,7 @@ const deleteEmployee = () => {
     .then((answer) => {
         let employeeID;
 
-        response.forEach((employee) => {
+        res.forEach((employee) => {
             if (
             answer.deleteEmployee ===
             `${employee.first_name} ${employee.last_name}`
@@ -426,7 +425,7 @@ const deleteEmployee = () => {
         });
 
         let query = `DELETE FROM employee WHERE employee.id = ?`;
-        connection.query(query, employeeId, (err) => {
+        connectDB.query(query, employeeID, (err) => {
             if (err) throw err;
             console.log('Employee Successfully Removed');
 
@@ -441,6 +440,7 @@ const deleteEmployee = () => {
 
                 console.table(res);
             });
+        startMenu();
         });
         });
     });
