@@ -25,7 +25,19 @@ const connectDB = mysql.createConnection({
 //Connect to MySQL & Start Title
 connectDB.connect((err) => {
     if (err) throw err
-    console.log('Connected to MySQL.');
+    const startText = 'This application will allow you to view and manage the departments, roles, and employees in your company.'
+    console.log(logo({ 
+        name: 'Employee Tracker',
+        font: 'Doom',
+        lineChars: 30,
+        padding: 3,
+        margin: 3,
+        borderColor: 'green',
+        logoColor: 'bold-green',
+        textColor: 'gray', })
+        .emptyLine()
+        .center(startText)
+        .render())
     startMenu();
 });
 
